@@ -28,19 +28,21 @@
 ## Directory layout
 
 ```
-  AI-DDos-Detection
-  ├── data                   # Project data directory
-  │   ├── raw                # Raw input data or temporary source files
-  │   ├── processed          # Preprocessed train/test CSV files and derived outputs
-  │   └── realtime_logs      # Runtime or experiment log outputs
-  ├── docs                   # Project documentation and progress notes
-  ├── models                 # Trained Random Forest models and evaluation metadata
-  └── src                    # Source code
-      ├── capture            # Packet/runtime-related modules
-      ├── features           # Dataset preprocessing and feature preparation code
-      ├── firewall           # Firewall-related extension modules
-      ├── models             # Training and prediction code
-      └── utils              # Shared configuration and helper code
+AI-DDos-Detection
+└── AI_engine
+    ├── data                   # Project data directory
+    │   ├── raw                # Raw input data or temporary source files
+    │   ├── processed          # Preprocessed train/test CSV files and derived outputs
+    │   └── realtime_logs      # Runtime or experiment log outputs
+    ├── docs                   # Project documentation and progress notes
+    ├── models                 # Trained Random Forest models and evaluation metadata
+    └── src                    # Source code
+        ├── capture            # Packet-related modules
+        ├── features           # Dataset preprocessing and feature preparation code
+        ├── firewall           # Firewall-related extension modules
+        ├── models             # Training and prediction code
+        └── utils              # Shared configuration and helper code
+>>>>>>> b7ed332 (Folder Rename)
 ```
 
 
