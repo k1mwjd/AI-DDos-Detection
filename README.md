@@ -1,21 +1,23 @@
-﻿  # AI-DDos-Detection
+  # AI-DDos-Detection
 
-  ## ?꾨줈?앺듃 媛쒖슂
-  蹂??꾨줈?앺듃???몃?留앹뿉???좎엯?섎뒗 ?ㅽ듃?뚰겕 ?몃옒?쎌쓣 遺꾩꽍?섏뿬 DDoS 怨듦꺽 ?щ?瑜??먮떒?섍퀬, ?뺤긽?쇰줈 ?먮퀎???몃옒?쎈쭔 ?대?
-  ?쒕쾭留앹쑝濡??꾨떖?섎뒗 AI 湲곕컲 DDoS 諛⑺솕踰?援ы쁽??紐⑺몴濡??쒕떎.
+  ## 프로젝트 개요
+  본 프로젝트는 외부망에서 유입되는 네트워크 트래픽을 분석하여 DDoS 공격 여부를 판단하고, 정상으로 판별된 트래픽만 내부
+  서버망으로 전달하는 AI 기반 DDoS 방화벽 구현을 목표로 한다.
 
-  ?대? ?꾪빐 CIC 怨꾩뿴 ?ㅽ듃?뚰겕 ?몃옒??CSV ?곗씠?곗뀑???ъ슜?섏뿬 ?뺤긽 ?몃옒?쎄낵 怨듦꺽 ?몃옒?쎌쓣 援щ텇?섎뒗 ?댁쭊 遺꾨쪟 紐⑤뜽???숈뒿
-  ?섏??? 紐⑤뜽? ?쒕뜡 ?щ젅?ㅽ듃(Random Forest) 遺꾨쪟湲곕? 湲곕컲?쇰줈 援ъ꽦?섏??쇰ŉ, ?곗씠???꾩쿂由? feature ?좏깮, 紐⑤뜽 ?숈뒿, ??  ???됯?, ?숈뒿 紐⑤뜽 ??κ퉴吏??怨쇱젙??援ы쁽?섏???
+  이를 위해 CIC 계열 네트워크 트래픽 CSV 데이터셋을 사용하여 정상 트래픽과 공격 트래픽을 구분하는 이진 분류 모델을 학습
+  하였다. 모델은 랜덤 포레스트(Random Forest) 분류기를 기반으로 구성하였으며, 데이터 전처리, feature 선택, 모델 학습, 성
+  능 평가, 학습 모델 저장까지의 과정을 구현하였다.
 
-  ?먰븳 ?ㅼ젣 ?ㅽ듃?뚰겕 ?섍꼍???곸슜?????덈룄濡? ?숈뒿???ъ슜?섎뒗 feature???댄썑 VM ?섍꼍?먯꽌???ㅼ떆 怨꾩궛 媛?ν븳 flow 湲곕컲
-  feature ?꾩＜濡??좎젙?섏??? ?대? 諛뷀깢?쇰줈 ?ν썑?먮뒗 ?ㅼ떆媛??ㅽ듃?뚰겕 ?몃옒??遺꾩꽍 諛?李⑤떒 湲곕뒫源뚯? ?뺤옣?섎뒗 寃껋쓣 紐⑺몴濡???  ??
+  또한 실제 네트워크 환경에 적용할 수 있도록, 학습에 사용되는 feature는 이후 VM 환경에서도 다시 계산 가능한 flow 기반
+  feature 위주로 선정하였다. 이를 바탕으로 향후에는 실시간 네트워크 트래픽 분석 및 차단 기능까지 확장하는 것을 목표로 한
+  다.
 
-  ## ?쒖뒪???붽뎄?ы빆
+  ## 시스템 요구사항
   - OS: Windows 11 Pro, 64-bit
-  - Virtual-Environments: VMware짰 Workstation Pro 25.0.0.24995812
+  - Virtual-Environments: VMware® Workstation Pro 25.0.0.24995812
   - Language: Python
   - Dataset: CIC-DDoS 2019
-  - ?꾩닔 ?쇱씠釉뚮윭由?
+  - 필수 라이브러리:
     - pandas
     - numpy
     - scikit-learn
@@ -26,24 +28,25 @@
 ## Directory layout
 
 ```
-AI-DDos-Detection
-└── dedos_Defense
-    └── AI_engine
-        ├── data                   # Project data directory
-        │   ├── raw                # Raw input data or temporary source files
-        │   ├── processed          # Preprocessed train/test CSV files and derived outputs
-        │   └── realtime_logs      # Runtime or experiment log outputs
-        ├── docs                   # Project documentation and progress notes
-        ├── models                 # Trained Random Forest models and evaluation metadata
-        └── src                    # Source code
-            ├── capture            # Packet-related modules
-            ├── features           # Dataset preprocessing and feature preparation code
-            ├── firewall           # Firewall-related extension modules
-            ├── models             # Training and prediction code
-            └── utils              # Shared configuration and helper code
+  AI-DDos-Detection
+  ├── data                   # Project data directory
+  │   ├── raw                # Raw input data or temporary source files
+  │   ├── processed          # Preprocessed train/test CSV files and derived outputs
+  │   └── realtime_logs      # Runtime or experiment log outputs
+  ├── docs                   # Project documentation and progress notes
+  ├── models                 # Trained Random Forest models and evaluation metadata
+  └── src                    # Source code
+      ├── capture            # Packet/runtime-related modules
+      ├── features           # Dataset preprocessing and feature preparation code
+      ├── firewall           # Firewall-related extension modules
+      ├── models             # Training and prediction code
+      └── utils              # Shared configuration and helper code
 ```
-## ?숈뒿 ?뚯씠?꾨씪??
-### 1. ?숈뒿 ?곗씠?곗뀑 ?앹꽦
+
+
+## 학습 파이프라인
+
+### 1. 학습 데이터셋 생성
 
 ```powershell
 .\.venv\Scripts\python.exe -m src.features.prepare_cic_csv_dataset `
@@ -55,7 +58,7 @@ AI-DDos-Detection
   --chunk-size 50000
 ```
 
-### 2. ?뚯뒪???곗씠?곗뀑 ?앹꽦
+### 2. 테스트 데이터셋 생성
 
 ```powershell
 .\.venv\Scripts\python.exe -m src.features.prepare_cic_csv_dataset `
@@ -67,7 +70,7 @@ AI-DDos-Detection
   --chunk-size 50000
 ```
 
-### 3. 紐⑤뜽 ?숈뒿 諛??됯?
+### 3. 모델 학습 및 평가
 
 ```powershell
 .\.venv\Scripts\python.exe -m src.models.train_model `
@@ -78,25 +81,25 @@ AI-DDos-Detection
   --n-estimators 300
 ```
 
-## ?꾩옱 寃곌낵
+## 현재 결과
 
-?뺤옣 ?곗씠?곗뀑 湲곗?:
+확장 데이터셋 기준:
 
 - train rows: `27392`
 - test rows: `17500`
 - total rows: `44892`
 
-?됯? 吏??
+평가 지표:
 
 - Precision: `0.9899`
 - Recall: `0.9689`
 - F1-score: `0.9792`
 
-?쇰룞?됰젹:
+혼동행렬:
 
 - TN = `3361`
 - FP = `139`
 - FN = `436`
 - TP = `13564`
 
-??寃곌낵???쇰꺼???덈뒗 ?뚯뒪??CSV瑜?湲곗??쇰줈 怨꾩궛??媛믪씠硫? ?꾩옱 ?쒖떆?섎뒗 紐⑤뜽 ?깅뒫 寃곌낵?????됯? 寃곌낵瑜?湲곗??쇰줈 ?쒕떎.
+이 결과는 라벨이 있는 테스트 CSV를 기준으로 계산한 값이며, 현재 제시하는 모델 성능 결과는 위 평가 결과를 기준으로 한다.
