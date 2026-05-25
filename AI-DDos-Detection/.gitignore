@@ -11,3 +11,17 @@ dist/
 .env
 *.csv
 *.pcap
+
+# Frontend & NestJS Dependencies
+**/node_modules/
+**/dist/
+**/.vite/
+**/.nuxt/
+
+# Local env files
+**.env
+**.env.local
+
+# Logs
+**/npm-debug.log*
+**/yarn-error.log*

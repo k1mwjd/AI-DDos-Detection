@@ -1,0 +1,13 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Node.js
+node_modules/
+dist/
+
+# Environment / Data
+.env
+*.csv
+*.pcap
