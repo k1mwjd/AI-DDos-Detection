@@ -31,29 +31,34 @@
 ## Directory layout
 
 ```text
-AI-DDos-Detection
-├── AI_engine
-│   ├── data
-│   │   ├── raw
-│   │   ├── processed
-│   │   └── realtime_logs
-│   ├── docs
-│   ├── models
-│   └── src
-│       ├── features
-│       ├── models
-│       └── utils
-└── Backend
-    ├── app
-    │   ├── main.py
-    │   ├── config.py
-    │   ├── schemas.py
-    │   └── services
-    │       ├── inference.py
-    │       ├── defense.py
-    │       └── flow_analysis.py
-    ├── requirements.txt
-    └── runtime_logs
+AI-DDos-Detection/          # 프로젝트 루트
+├── AI_engine/              # AI/ML 탐지 엔진 (Python, Random Forest)
+│   ├── data/
+│   │   ├── raw/
+│   │   ├── processed/
+│   │   └── realtime_logs/
+│   ├── docs/
+│   ├── models/
+│   └── src/
+│       ├── capture/
+│       ├── features/
+│       ├── firewall/
+│       ├── models/
+│       └── utils/
+├── Backend/                # FastAPI 탐지 API 서버 (Python)
+│   ├── app/
+│   │   ├── main.py
+│   │   ├── config.py
+│   │   ├── schemas.py
+│   │   └── services/
+│   │       ├── inference.py
+│   │       ├── defense.py
+│   │       └── flow_analysis.py
+│   ├── requirements.txt
+│   └── runtime_logs/
+├── Frontend/          # React/Vite 모니터링 대시보드
+├── nest_gateway/           # NestJS API 게이트웨이
+└── Docker_DB/              # Docker DB 설정 (예정)
 ```
 
 ## 데이터 사용 방식
@@ -237,6 +242,34 @@ Invoke-RestMethod `
   -Uri "http://127.0.0.1:8000/blocked-sources/192.168.0.10" `
   -Method Delete
 ```
+
+## 프론트엔드 실행 (Frontend)
+
+AI 엔진 및 백엔드가 분석한 실시간 네트워크 트래픽 상태와 방화벽 차단 현황을 시각화하는 보안 관제 대시보드입니다.
+
+### 폴더 구조
+```text
+Frontend/
+├── public/                 # 정적 자산 (아이콘 등)
+├── src/
+│   ├── assets/             # 컴포넌트 내부 이미지/자산
+│   ├── App.tsx             # 대시보드 메인 UI 및 상태/통신 로직
+│   ├── main.tsx            # React 진입점
+│   └── index.css           # 글로벌 스타일
+├── index.html
+├── package.json
+├── vite.config.ts
+└── tsconfig.json
+```
+
+### 실행 방법
+```powershell
+cd "AI-DDos-Detection\Frontend"
+npm install
+npm run dev
+```
+
+---
 
 ## 현재 결과
 - train rows: `27392`
