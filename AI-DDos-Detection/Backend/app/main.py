@@ -6,6 +6,7 @@ from typing import List
 
 import pandas as pd
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import DEFAULT_BLOCK_SECONDS, DEFAULT_DEFENSE_THRESHOLD, DEFAULT_MODEL_PATH, ENABLE_WINDOWS_FIREWALL, FEATURE_COLUMNS
 from app.schemas import (
@@ -27,6 +28,19 @@ app = FastAPI(
     title="AI DDoS Firewall Backend",
     version="1.0.0",
     description="VM1 backend for model inference, packet capture analysis, and defense actions.",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:4173",
+        "http://127.0.0.1:4173",
+    ],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 inference_service = ModelInferenceService(model_path=DEFAULT_MODEL_PATH)
