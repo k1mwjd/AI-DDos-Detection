@@ -1,0 +1,23 @@
+.omx/
+.codex/*
+!.codex/agents/
+!.codex/agents/**
+!.codex/skills/
+!.codex/skills/**
+.codex/skills/.system/**
+!.codex/prompts/
+!.codex/prompts/**
+
+# Local Codex / OMX runtime files
+.codex/
+.omx/
+.omx-runs/
+AGENTS.md
+
+# Common local files
+node_modules/
+.venv/
+.env
+.env.*
+__pycache__/
+*.pyc
