@@ -3,7 +3,10 @@
 ## 프로젝트 개요
 본 프로젝트는 외부망에서 유입되는 네트워크 트래픽을 분석하여 DDoS 공격 여부를 판단하고, 정상으로 판별된 트래픽만 내부 서버망으로 전달하는 AI 기반 DDoS 방화벽 구현을 목표로 한다.
 
-이를 위해 CIC 계열 네트워크 트래픽 CSV 데이터셋을 사용하여 정상 트래픽과 공격 트래픽을 구분하는 이진 분류 모델을 학습하였다. 모델은 랜덤 포레스트(Random Forest) 분류기를 기반으로 구성하였으며, 데이터 전처리, feature 선택, 모델 학습, 성능 평가, 학습 모델 저장까지의 과정을 구현하였다.
+이를 위해 CIC 계열 네트워크 트래픽 CSV 데이터셋을 사용하여 정상 트래픽과 공격 트래픽을 구분하는 이진 분류 모델을 학습하였다.
+
+AI 엔진 고도화 및 MLOps 적용
+기존 단일 모델을 넘어 Random Forest, XGBoost, LightGBM, Logistic Regression 4가지 알고리즘을 동시 학습하고 유효성을 비교(Evaluation)하는 파이프라인을 구축하였다. 또한, 학습 완료 시 **가장 F1-Score가 높은 최적의 모델을 찾아 백엔드 서버(FastAPI)의 기본 방화벽 엔진으로 자동 탑재(Auto-Deployment)**하는 로직을 적용하였다.
 
 또한 실제 네트워크 환경에 적용할 수 있도록, 학습에 사용되는 feature는 이후 VM 환경에서도 다시 계산 가능한 flow 기반 feature 위주로 선정하였다. 이를 바탕으로 향후에는 실시간 네트워크 트래픽 분석 및 차단 기능까지 확장하는 것을 목표로 한다.
 
@@ -64,6 +67,12 @@ AI-DDos-Detection/          # 프로젝트 루트
 └── nest_gateway/           # NestJS API 게이트웨이
 ```
 
+##  Quick Start 
+전체 환경 세팅 및 라이브러리 설치는 제공된 배치 파일을 통해 한 번에 진행할 수 있습니다.
+1. 프로젝트 루트 폴더에서 아래 파일 실행
+   ```powershell
+   .\install_all.bat
+
 ## 데이터 사용 방식
 - 학습용 데이터: `01-12`
 - 테스트용 데이터: `03-11`
@@ -104,7 +113,7 @@ AI-DDos-Detection/          # 프로젝트 루트
 | high       | 70 ~ 89        |
 | critical   | 90 ~ 100       |
 
-`prediction == 1`이고 `risk_score >= threshold`인 경우에만 차단이 실행된다.
+`prediction == 1`이고 `sk_score >= threshold`인 경우에만 차단이 실행된다.
 
 
 ## 학습 파이프라인
@@ -130,14 +139,14 @@ AI-DDos-Detection/          # 프로젝트 루트
   --chunk-size 50000
 ```
 
-### 3. 모델 학습 및 평가
+### 3. 다중 모델 동시 학습 및 자동 배포 실행
 ```powershell
-.\.venv\Scripts\python.exe -m src.models.train_model `
-  --train-csv data\processed\train_dataset_medium.csv `
-  --test-csv data\processed\test_dataset_medium.csv `
-  --model-output models\random_forest_medium.joblib `
-  --metadata-output models\model_metadata_medium.json `
-  --n-estimators 300
+python -m src.models.train_model `
+  --train-csv data/processed/train_dataset_medium.csv `
+  --test-csv data/processed/test_dataset_medium.csv `
+  --model-output models/random_forest_medium.joblib `
+  --metadata-output models/model_metadata_medium.json `
+  --n-estimators 200
 ```
 ---
 
@@ -283,11 +292,5 @@ Frontend/
 └── tsconfig.json
 ```
 
-### 실행 방법
-```powershell
-cd "AI-DDos-Detection\Frontend"
-npm install
-npm run dev
-```
 
 

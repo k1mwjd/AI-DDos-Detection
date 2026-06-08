@@ -122,6 +122,11 @@ def train_model(
             importance_path = metadata_output.with_name(f"feature_importance_{name}.csv")
             importance_df.to_csv(importance_path, index=False)
 
+    # 🔥 [자동 배포 로직 추가] 반복문이 끝난 직후, 가장 점수가 높은 모델을 기본 이름으로 덮어쓰기
+    best_model_instance = models[best_model_name]
+    joblib.dump(best_model_instance, model_output)
+    print(f"\n🥇 [자동 배포 완료] F1-Score 최고점 모델: '{best_model_name}' -> 백엔드용({model_output.name})으로 탑재되었습니다.")
+
     # 3. 💡 비교 결과를 하나의 JSON 메타데이터로 합쳐서 저장
     metadata = {
         "feature_columns": FEATURE_COLUMNS,
