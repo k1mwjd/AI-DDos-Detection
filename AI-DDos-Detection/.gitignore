@@ -11,6 +11,11 @@ dist/
 .env
 *.csv
 *.pcap
+!AI_engine/data/processed/train_dataset_medium.csv
+!AI_engine/data/processed/test_dataset_medium.csv
+
+# Local experiment copies
+__experiments/
 
 # Frontend & NestJS Dependencies
 **/node_modules/

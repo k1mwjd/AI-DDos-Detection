@@ -1,9 +1,11 @@
+/* 대시보드 전체 폭, 중앙 정렬, 페이지 여백을 담당 */
 .dashboard-shell {
   width: min(1400px, calc(100% - 32px));
   margin: 0 auto;
   padding: 32px 0 56px;
 }
 
+/* 상단 헤더는 제목 영역과 백엔드 상태 패널을 좌우로 배치 */
 .dashboard-header {
   display: flex;
   justify-content: space-between;
@@ -12,6 +14,7 @@
   margin-bottom: 24px;
 }
 
+/* 작은 섹션 라벨에 공통으로 쓰는 강조 스타일 */
 .eyebrow {
   margin: 0 0 8px;
   color: var(--accent);
@@ -31,6 +34,7 @@
   color: var(--text-muted);
 }
 
+/* 백엔드 연결 상태 패널과 online/offline 상태 표시 점 정의 */
 .status-panel {
   display: grid;
   grid-template-columns: auto 1fr auto;
@@ -74,6 +78,7 @@
   box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.14);
 }
 
+/* 서버 상태, 최근 위험도, 차단 IP 수, 마지막 분석 결과를 카드로 배치 */
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -81,6 +86,7 @@
   margin-bottom: 18px;
 }
 
+/* 카드와 패널의 공통 테두리, 배경, 그림자 스타일 */
 .summary-card,
 .panel,
 .alert {
@@ -116,6 +122,7 @@
   word-break: break-all;
 }
 
+/* 위험도별 카드 테두리 색상을 바꿔 최근 상태를 빠르게 구분 */
 .risk-low {
   border-color: rgba(34, 197, 94, 0.45);
 }
@@ -129,6 +136,7 @@
   border-color: rgba(239, 68, 68, 0.55);
 }
 
+/* 기능별 입력 패널의 제목/본문 여백을 관리 */
 .panel {
   padding: 24px;
   margin-top: 18px;
@@ -146,6 +154,7 @@
   margin: 0;
 }
 
+/* 폼 입력은 일반 2열, 예측 메타 정보는 compact 3열, feature는 4열로 배치 */
 .form-grid,
 .feature-grid {
   display: grid;
@@ -165,6 +174,7 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+/* 입력 필드와 포커스 링 스타일 */
 label {
   display: grid;
   gap: 7px;
@@ -205,6 +215,7 @@ input:focus {
   height: 18px;
 }
 
+/* 버튼 계열의 기본, 보조, 위험 액션 스타일 */
 button {
   border: none;
   border-radius: 12px;
@@ -238,6 +249,7 @@ button:disabled {
   background: var(--danger);
 }
 
+/* 요청 버튼 옆에 loading/error/success 메시지 배치 */
 .action-row {
   display: flex;
   flex-wrap: wrap;
@@ -268,6 +280,7 @@ button:disabled {
   padding: 14px 18px;
 }
 
+/* 예측 결과와 분석 결과 상세 박스의 공통 스타일 */
 .result-card,
 .analysis-result {
   margin-top: 20px;
@@ -298,6 +311,7 @@ button:disabled {
   color: var(--text-muted);
 }
 
+/* 위험도 배지는 백엔드 risk_level 값에 맞춰 색상을 바꿈 */
 .risk-badge {
   display: inline-flex;
   align-items: center;
@@ -327,6 +341,7 @@ button:disabled {
   background: rgba(239, 68, 68, 0.2);
 }
 
+/* 예측 결과의 key/value 메트릭과 로그 경로를 2열로 보여줌 */
 .metrics-list,
 .log-list {
   display: grid;
@@ -353,6 +368,7 @@ dd {
   word-break: break-word;
 }
 
+/* PCAP 분석 패널과 실시간 분석 패널을 데스크톱에서 2열로 배치 */
 .two-column {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -363,6 +379,7 @@ dd {
   align-self: start;
 }
 
+/* 분석 summary의 total/attack/benign 수치를 작은 카드처럼 보여줌 */
 .mini-summary {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -383,6 +400,7 @@ dd {
   font-size: 22px;
 }
 
+/* 분석 결과 중 최대 5개 flow preview를 목록 형태로 표시 */
 .json-preview {
   display: grid;
   gap: 10px;
@@ -412,6 +430,7 @@ dd {
   font-size: 13px;
 }
 
+/* 결과가 없을 때 보여주는 빈 상태 박스 */
 .empty-state {
   padding: 18px;
   border: 1px dashed var(--border);
@@ -420,6 +439,7 @@ dd {
   background: var(--subpanel);
 }
 
+/* 차단된 IP 목록의 행 레이아웃과 해제 버튼 위치 정의 */
 .blocked-list {
   display: grid;
   gap: 10px;
@@ -447,6 +467,7 @@ dd {
   font-size: 13px;
 }
 
+/* 태블릿 이하에서는 주요 그리드를 1~2열로 줄여 가독성 유지 */
 @media (max-width: 1120px) {
   .dashboard-header,
   .two-column {
@@ -467,6 +488,7 @@ dd {
   }
 }
 
+/* 모바일에서는 모든 주요 입력/결과 그리드를 1열로 내려 겹침 방지 */
 @media (max-width: 720px) {
   .dashboard-shell {
     width: min(100% - 20px, 1400px);

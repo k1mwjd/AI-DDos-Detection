@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import './App.css'
 
+// 백엔드 주소는 .env의 VITE_API_BASE_URL을 우선 사용하고, 없으면 로컬 FastAPI 기본 주소 사용
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? 'http://127.0.0.1:8000').replace(/\/$/, '')
 
+// 모델이 요구하는 feature 키와 화면에 보여줄 라벨을 한 곳에서 관리
 const featureDefinitions = [
   ['destination_port', 'Destination port'],
   ['protocol', 'Protocol'],
@@ -26,9 +28,11 @@ const featureDefinitions = [
   ['down_up_ratio', 'Down/up ratio'],
 ] as const
 
+// featureDefinitions에서 feature 이름 타입을 자동으로 만들고, 모든 feature 값을 number로 제한
 type FeatureName = (typeof featureDefinitions)[number][0]
 type FeatureValues = Record<FeatureName, number>
 
+// 백엔드 API의 요청/응답 구조를 프론트엔드에서 타입으로 맞춰 관리
 type HealthResponse = {
   status: string
   model_path: string
@@ -87,6 +91,7 @@ type OperationState = {
 
 type ConnectionState = 'checking' | 'online' | 'offline'
 
+// 예측 테스트 폼을 처음 열었을 때 채워지는 샘플 feature 값
 const defaultFeatures: FeatureValues = {
   destination_port: 80,
   protocol: 6,
@@ -110,22 +115,26 @@ const defaultFeatures: FeatureValues = {
   down_up_ratio: 0.06,
 }
 
+// 요청 버튼 주변에서 공통으로 사용하는 loading/error/success 상태
 const initialOperationState: OperationState = {
   loading: false,
   error: null,
   message: null,
 }
 
+// 차단 목록은 첫 화면에서 바로 불러오므로 초기 loading 값을 true로 둠
 const initialBlockedState: OperationState = {
   loading: true,
   error: null,
   message: null,
 }
 
+// catch로 받은 unknown 값을 화면에 표시할 수 있는 문자열로 변환
 function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.'
 }
 
+// 모든 백엔드 요청에서 공통으로 사용하는 JSON fetch helper
 async function requestJson<T>(path: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
@@ -145,7 +154,6 @@ async function requestJson<T>(path: string, options: RequestInit = {}): Promise<
         detail = JSON.stringify(payload.detail)
       }
     } catch {
-      // Use the HTTP status text when the body is not JSON.
     }
     throw new Error(`${response.status} ${detail}`)
   }
@@ -153,10 +161,12 @@ async function requestJson<T>(path: string, options: RequestInit = {}): Promise<
   return (await response.json()) as T
 }
 
+// 0~1 범위의 확률 값을 사람이 읽기 쉬운 퍼센트 문자열로 변환
 function formatPercent(value: number): string {
   return `${(value * 100).toFixed(1)}%`
 }
 
+// 분석 결과 테이블에 표시할 수 있도록 unknown 값을 안정적인 문자열로 변환
 function formatValue(value: unknown): string {
   if (typeof value === 'number') {
     return Number.isInteger(value) ? value.toString() : value.toFixed(4)
@@ -170,6 +180,7 @@ function formatValue(value: unknown): string {
   return String(value)
 }
 
+// 백엔드가 내려준 risk_level 값을 CSS 클래스 이름으로 안전하게 매핑
 function getRiskClass(riskLevel: string | undefined): string {
   if (!riskLevel) {
     return 'neutral'
@@ -178,10 +189,12 @@ function getRiskClass(riskLevel: string | undefined): string {
 }
 
 function App() {
+  // 백엔드 연결 상태와 /health 응답 관리
   const [connectionState, setConnectionState] = useState<ConnectionState>('checking')
   const [health, setHealth] = useState<HealthResponse | null>(null)
   const [healthError, setHealthError] = useState<string | null>(null)
 
+  // /predict 요청에 사용할 입력값, 결과, 요청 상태 관리
   const [sourceIp, setSourceIp] = useState('192.168.0.10')
   const [destinationIp, setDestinationIp] = useState('')
   const [flowId, setFlowId] = useState('demo-flow-001')
@@ -189,12 +202,14 @@ function App() {
   const [predictionResult, setPredictionResult] = useState<PredictionResponse | null>(null)
   const [predictionState, setPredictionState] = useState<OperationState>(initialOperationState)
 
+  // /analyze/pcap 요청에 사용할 PCAP 경로, 옵션, 결과 상태
   const [pcapPath, setPcapPath] = useState('C:\\path\\to\\sample.pcap')
   const [pcapApplyDefense, setPcapApplyDefense] = useState(false)
   const [pcapPacketLimit, setPcapPacketLimit] = useState('50000')
   const [pcapResult, setPcapResult] = useState<FlowAnalysisResponse | null>(null)
   const [pcapState, setPcapState] = useState<OperationState>(initialOperationState)
 
+  // /analyze/live 요청에 사용할 인터페이스, 캡처 시간, 옵션, 결과 상태
   const [liveInterface, setLiveInterface] = useState('Ethernet')
   const [liveDuration, setLiveDuration] = useState(10)
   const [livePacketLimit, setLivePacketLimit] = useState('')
@@ -202,12 +217,15 @@ function App() {
   const [liveResult, setLiveResult] = useState<FlowAnalysisResponse | null>(null)
   const [liveState, setLiveState] = useState<OperationState>(initialOperationState)
 
+  // 현재 차단된 source IP 목록과 목록 갱신/해제 요청 상태입
   const [blockedSources, setBlockedSources] = useState<BlockedSource[]>([])
   const [blockedState, setBlockedState] = useState<OperationState>(initialBlockedState)
 
+  // PCAP 분석과 실시간 분석 중 가장 최근 결과를 요약 카드에 표시
   const latestAnalysis = liveResult ?? pcapResult
   const recentRisk = predictionResult?.risk_level ?? latestAnalysis?.results[0]?.risk_level?.toString() ?? 'none'
 
+  // 분석 결과가 없을 때와 있을 때의 요약 문구를 분리해 렌더링을 단순하게 유지
   const lastAnalysisLabel = useMemo(() => {
     if (!latestAnalysis) {
       return '아직 실행 전'
@@ -215,6 +233,7 @@ function App() {
     return `${latestAnalysis.summary.total_flows} flows · attack ${latestAnalysis.summary.attack_flows}`
   }, [latestAnalysis])
 
+  // /health를 호출해 백엔드 연결 여부, 모델 feature 개수, 방화벽 설정 확인
   const checkHealth = async () => {
     try {
       const result = await requestJson<HealthResponse>('/health')
@@ -228,6 +247,7 @@ function App() {
     }
   }
 
+  // 차단 목록을 다시 불러와 대시보드의 차단 IP 수와 목록 동기화
   const loadBlockedSources = async () => {
     try {
       const result = await requestJson<BlockedSourceListResponse>('/blocked-sources')
@@ -238,6 +258,7 @@ function App() {
     }
   }
 
+  // 첫 렌더링 직후 서버 상태와 차단 목록을 자동으로 조회
   useEffect(() => {
     const timerId = window.setTimeout(() => {
       void checkHealth()
@@ -247,6 +268,7 @@ function App() {
     return () => window.clearTimeout(timerId)
   }, [])
 
+  // number input의 문자열 값을 모델 payload에 맞게 number로 변환해 저장
   const updateFeature = (name: FeatureName, value: string) => {
     setFeatures((current) => ({
       ...current,
@@ -254,10 +276,12 @@ function App() {
     }))
   }
 
+  // 예측 테스트 feature 값을 샘플 기본값으로 되돌림
   const resetFeatures = () => {
     setFeatures(defaultFeatures)
   }
 
+  // 예측 폼 제출 시 /predict에 feature payload를 보내고 결과를 화면에 반영
   const submitPrediction = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setPredictionState({ loading: true, error: null, message: null })
@@ -281,6 +305,7 @@ function App() {
     }
   }
 
+  // PCAP 분석 폼 제출 시 서버 로컬 경로의 PCAP 파일을 백엔드에서 분석하도록 요청
   const submitPcapAnalysis = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setPcapState({ loading: true, error: null, message: null })
@@ -301,6 +326,7 @@ function App() {
     }
   }
 
+  // 실시간 분석 폼 제출 시 지정한 네트워크 인터페이스를 백엔드가 캡처하도록 요청
   const submitLiveAnalysis = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setLiveState({ loading: true, error: null, message: null })
@@ -322,6 +348,7 @@ function App() {
     }
   }
 
+  // 차단 목록의 특정 source IP를 해제하고, 완료 후 목록을 다시 조회
   const unblockSource = async (sourceIpToUnblock: string) => {
     setBlockedState({ loading: true, error: null, message: null })
     try {
@@ -337,6 +364,7 @@ function App() {
 
   return (
     <main className="dashboard-shell">
+      {/* 상단 영역: 서비스 제목과 백엔드 연결 상태 표시 */}
       <header className="dashboard-header">
         <div>
           <p className="eyebrow">AI DDoS Defense Monitor</p>
@@ -362,8 +390,10 @@ function App() {
         </div>
       </header>
 
+      {/* 백엔드 연결에 실패했을 때만 오류 배너를 노출 */}
       {healthError && <div className="alert error">백엔드 연결 실패: {healthError}</div>}
 
+      {/* 요약 카드: 서버 상태, 최근 위험도, 차단 IP 수, 마지막 분석 결과를 보여줌 */}
       <section className="summary-grid" aria-label="요약 카드">
         <article className="summary-card">
           <span>서버 상태</span>
@@ -387,6 +417,7 @@ function App() {
         </article>
       </section>
 
+      {/* 예측 테스트: 수동으로 feature를 입력해 /predict API 동작을 확인 */}
       <section className="panel prediction-panel">
         <div className="panel-heading">
           <div>
@@ -444,6 +475,7 @@ function App() {
         )}
       </section>
 
+      {/* 분석 영역: PCAP 파일 분석과 실시간 인터페이스 분석을 나란히 제공 */}
       <div className="two-column">
         <AnalysisPanel
           title="PCAP 분석"
@@ -492,6 +524,7 @@ function App() {
         </AnalysisPanel>
       </div>
 
+      {/* 방어 API 영역: 현재 차단 목록을 확인하고 개별 IP 차단 해제 */}
       <section className="panel">
         <div className="panel-heading">
           <div>
@@ -533,6 +566,7 @@ function App() {
   )
 }
 
+// 요청 실행 버튼과 성공/오류 메시지를 공통 형태로 출력
 function ActionRow({ state, submitLabel }: { state: OperationState; submitLabel: string }) {
   return (
     <div className="action-row">
@@ -544,6 +578,7 @@ function ActionRow({ state, submitLabel }: { state: OperationState; submitLabel:
   )
 }
 
+// OperationState에 error가 있으면 오류, message가 있으면 성공 메시지 표시
 function StatusMessage({ state }: { state: OperationState }) {
   if (state.error) {
     return <span className="inline-status error">{state.error}</span>
@@ -554,6 +589,7 @@ function StatusMessage({ state }: { state: OperationState }) {
   return null
 }
 
+// PCAP 분석과 실시간 분석이 같은 레이아웃을 공유하도록 만든 재사용 패널
 function AnalysisPanel({
   title,
   eyebrow,
@@ -586,6 +622,7 @@ function AnalysisPanel({
   )
 }
 
+// 분석 응답의 summary와 results 일부를 대시보드에서 빠르게 확인할 수 있게 렌더링
 function AnalysisResult({ result }: { result: FlowAnalysisResponse }) {
   const previewRows = result.results.slice(0, 5)
   return (

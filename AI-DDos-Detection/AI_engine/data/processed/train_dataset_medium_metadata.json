@@ -1,5 +1,5 @@
 {
-  "input_dir": "..\\data\\csv\\01-12",
+  "input_dir": "G:\\인지프 프로젝트\\data\\csv\\01-12",
   "output_csv": "data\\processed\\train_dataset_medium.csv",
   "feature_columns": [
     "destination_port",

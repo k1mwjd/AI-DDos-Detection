@@ -1,3 +1,4 @@
+/* 앱 전체에서 공유하는 색상, 글꼴, 그림자 토큰 */
 :root {
   --text: #64748b;
   --text-muted: #94a3b8;
@@ -26,10 +27,12 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* 모든 요소가 width 계산에 padding과 border를 포함하도록 맞춤 */
 * {
   box-sizing: border-box;
 }
 
+/* 대시보드의 어두운 배경, 그리드 패턴, 전체 화면 높이 정의 */
 body {
   min-width: 320px;
   min-height: 100vh;
@@ -40,6 +43,7 @@ body {
     linear-gradient(135deg, #07111f 0%, #0f172a 48%, #111827 100%);
 }
 
+/* 배경 위에 얇은 격자 패턴을 고정으로 깔아 보안 모니터 느낌 주기 */
 body::before {
   position: fixed;
   inset: 0;
@@ -52,10 +56,12 @@ body::before {
   mask-image: linear-gradient(to bottom, black, transparent 80%);
 }
 
+/* React 앱이 뷰포트 전체 높이를 채울 수 있게 함 */
 #root {
   min-height: 100vh;
 }
 
+/* 제목 계층의 공통 색상과 크기 규칙 */
 h1,
 h2,
 h3 {
